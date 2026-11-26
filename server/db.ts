@@ -31,6 +31,7 @@ export interface TxDoc {
 }
 export interface ReceiptDoc { _id: string; userId: string; mime: string; name?: string; data: Buffer; size: number; createdAt: Date }
 export interface AuthCodeDoc { _id: string; userId: string; createdAt: Date }
+export interface UsageDoc { _id: string; userId: string; count: number; createdAt: Date }
 
 // Reutiliza a ligação entre invocações da função serverless.
 const g = globalThis as unknown as { __mongo?: Promise<MongoClient>; __indexes?: Promise<unknown> };
@@ -41,7 +42,8 @@ export async function getDb(): Promise<Db> {
   g.__indexes ??= Promise.all([
     db.collection('transactions').createIndex({ userId: 1, date: -1 }),
     db.collection('receipts').createIndex({ userId: 1 }),
-    db.collection('authcodes').createIndex({ createdAt: 1 }, { expireAfterSeconds: 300 })
+    db.collection('authcodes').createIndex({ createdAt: 1 }, { expireAfterSeconds: 300 }),
+    db.collection('usage').createIndex({ createdAt: 1 }, { expireAfterSeconds: 3 * 86400 })
   ]).catch(() => undefined);
   return db;
 }
@@ -52,6 +54,7 @@ export async function cols() {
     users: db.collection<UserDoc>('users') as Collection<UserDoc>,
     transactions: db.collection<TxDoc>('transactions') as Collection<TxDoc>,
     receipts: db.collection<ReceiptDoc>('receipts') as Collection<ReceiptDoc>,
-    authcodes: db.collection<AuthCodeDoc>('authcodes') as Collection<AuthCodeDoc>
+    authcodes: db.collection<AuthCodeDoc>('authcodes') as Collection<AuthCodeDoc>,
+    usage: db.collection<UsageDoc>('usage') as Collection<UsageDoc>
   };
 }
