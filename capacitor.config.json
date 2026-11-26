@@ -1,6 +1,0 @@
-{
-  "appId": "pt.carteira.app",
-  "appName": "Carteira PT",
-  "webDir": "dist",
-  "android": { "backgroundColor": "#0b1220" }
-}

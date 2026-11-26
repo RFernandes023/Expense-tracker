@@ -37,7 +37,8 @@ export const setToken = (t: string) => { token = t; };
 export const setUnauthorizedHandler = (fn: () => void) => { onUnauthorized = fn; };
 
 async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
-  if (IS_NATIVE && !API_BASE) throw new ApiError('Servidor não configurado nesta app (VITE_API_URL).', 0);
+  // No Android a app pode abrir o site da Vercel diretamente (mesmo domínio) ou usar a versão embutida (localhost).
+  if (IS_NATIVE && !API_BASE && location.hostname === 'localhost') throw new ApiError('Servidor não configurado nesta app (VITE_API_URL).', 0);
   let r: Response;
   try {
     r = await fetch(`${API_BASE}${path}`, {

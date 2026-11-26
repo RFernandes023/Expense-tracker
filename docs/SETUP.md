@@ -121,6 +121,8 @@ A partir daqui, cada push para `main` atualiza a app automaticamente.
 
 Os dados são os mesmos no APK e no browser — estão todos no MongoDB Atlas.
 
+A app Android abre diretamente o site da Vercel (`API_URL`), por isso cada atualização publicada na Vercel aparece logo no telemóvel, sem instalar um APK novo.
+
 ## Problemas comuns
 
 | Sintoma | Solução |
