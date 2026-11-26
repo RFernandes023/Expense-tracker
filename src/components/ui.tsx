@@ -25,7 +25,7 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
   );
 }
 
-export function TxRow({ t, onClick, showDate }: { t: Transaction; onClick?: () => void; showDate?: boolean }) {
+export function TxRow({ t, onClick, showDate, match }: { t: Transaction; onClick?: () => void; showDate?: boolean; match?: string }) {
   const c = getCategory(t.category);
   const deductible = c.deduction && t.type === 'expense';
   return (
@@ -37,8 +37,10 @@ export function TxRow({ t, onClick, showDate }: { t: Transaction; onClick?: () =
           <span>{c.label}</span>
           {showDate && <span>· {formatDate(t.date)}</span>}
           {(t.recurring || t.recurringOf) && <span className="tag">🔁 mensal</span>}
+          {t.receiptId && <span className="tag">📎 fatura</span>}
           {deductible && (t.withNif === false ? <span className="tag warn">sem NIF</span> : <span className="tag ok">e-Fatura</span>)}
         </div>
+        {match && <div className="ocr-match">{match}</div>}
       </div>
       <div className={`tx-amt num ${t.type === 'income' ? 'in' : ''}`}>{t.type === 'income' ? '+' : '−'}{fmt(t.amount)}</div>
     </div>

@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
+      workbox: { navigateFallbackDenylist: [/^\/api\//] },
       manifest: {
         name: 'Carteira PT — Gestor de Despesas',
         short_name: 'Carteira PT',

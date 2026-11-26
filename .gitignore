@@ -6,3 +6,6 @@ android/.gradle
 android/build
 .DS_Store
 dist-artifact
+.env*.local
+.env
+.vercel

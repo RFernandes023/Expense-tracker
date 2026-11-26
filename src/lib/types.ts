@@ -10,6 +10,13 @@ export interface Transaction {
   withNif?: boolean; // fatura pedida com NIF (e-Fatura)
   recurring?: boolean; // repete todos os meses
   recurringOf?: string; // id do movimento original
+  // Dados lidos da fatura (OCR / texto do PDF)
+  merchant?: string;
+  merchantNif?: string;
+  vat?: number;
+  atcud?: string;
+  ocrText?: string; // texto integral da fatura, pesquisável
+  receiptId?: string; // ficheiro original guardado na base de dados
 }
 
 export interface Settings {

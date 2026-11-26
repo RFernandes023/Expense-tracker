@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { expenseCategories } from '../lib/categories';
+import type { Session } from '../lib/api';
 import { parseBackup, toCSV } from '../lib/storage';
 import type { AppData, Settings } from '../lib/types';
 
@@ -9,6 +10,9 @@ interface Props {
   replaceData: (d: AppData) => void;
   onDemo: () => void;
   notify: (msg: string) => void;
+  session?: Session | null;
+  sync?: 'ok' | 'loading' | 'error';
+  onLogout?: () => void;
 }
 
 function download(name: string, content: string, mime: string) {
@@ -18,7 +22,7 @@ function download(name: string, content: string, mime: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function SettingsView({ data, setSettings, replaceData, onDemo, notify }: Props) {
+export function SettingsView({ data, setSettings, replaceData, onDemo, notify, session, sync, onLogout }: Props) {
   const s = data.settings;
   const file = useRef<HTMLInputElement>(null);
   const [confirmWipe, setConfirmWipe] = useState(false);
@@ -35,6 +39,20 @@ export function SettingsView({ data, setSettings, replaceData, onDemo, notify }:
   return (
     <div className="grid two">
       <div className="grid">
+        {session && (
+          <div className="card">
+            <h2>Conta</h2>
+            <div className="account">
+              {session.user.picture ? <img src={session.user.picture} alt="" referrerPolicy="no-referrer" /> : <span className="avatar">{session.user.name.slice(0, 1)}</span>}
+              <div style={{ minWidth: 0 }}>
+                <b>{session.user.name}</b>
+                <div className="small muted" style={{ overflowWrap: 'anywhere' }}>{session.user.email}</div>
+              </div>
+            </div>
+            <p className="small muted" style={{ marginTop: 0 }}>{sync === 'error' ? '⚠ Algumas alterações não foram sincronizadas. Verifica a ligação.' : '☁️ Dados sincronizados na tua conta (MongoDB Atlas).'}</p>
+            <button className="btn" onClick={onLogout}>Terminar sessão</button>
+          </div>
+        )}
         <div className="card">
           <h2>Perfil e agregado</h2>
           <div className="field"><label htmlFor="nm">Nome</label><input id="nm" className="input" value={s.name} onChange={(e) => set('name', e.target.value)} placeholder="Como te chamas?" /></div>
@@ -50,7 +68,7 @@ export function SettingsView({ data, setSettings, replaceData, onDemo, notify }:
         </div>
         <div className="card">
           <h2>Dados</h2>
-          <p className="small muted" style={{ marginTop: 0 }}>Os teus dados ficam apenas neste dispositivo. Faz cópias de segurança regularmente.</p>
+          <p className="small muted" style={{ marginTop: 0 }}>{session ? 'Exporta uma cópia de segurança ou importa dados de outro dispositivo.' : 'Os teus dados ficam apenas neste dispositivo. Faz cópias de segurança regularmente.'}</p>
           <div className="btn-row">
             <button className="btn" onClick={() => download(`carteira-pt-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(data, null, 2), 'application/json')}>⬇️ Exportar cópia</button>
             <button className="btn" onClick={() => file.current?.click()}>⬆️ Importar cópia</button>

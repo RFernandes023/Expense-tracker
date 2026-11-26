@@ -13,9 +13,12 @@ export const defaultSettings: Settings = {
   theme: 'auto'
 };
 
-export function load(): AppData {
+/** Cache local. Com conta, cada utilizador tem a sua cópia (chave com o email). */
+const keyFor = (user?: string) => (user ? `${KEY}:${user}` : KEY);
+
+export function load(user?: string): AppData {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(keyFor(user));
     if (raw) {
       const d = JSON.parse(raw) as AppData;
       return { version: 1, transactions: d.transactions ?? [], settings: { ...defaultSettings, ...d.settings } };
@@ -24,8 +27,8 @@ export function load(): AppData {
   return { version: 1, transactions: [], settings: defaultSettings };
 }
 
-export function save(d: AppData) {
-  try { localStorage.setItem(KEY, JSON.stringify(d)); } catch { /* ignore */ }
+export function save(d: AppData, user?: string) {
+  try { localStorage.setItem(keyFor(user), JSON.stringify(d)); } catch { /* ignore */ }
 }
 
 export function parseBackup(text: string): AppData {

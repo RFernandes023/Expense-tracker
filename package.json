@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Expense tracker com sugestões para a realidade portuguesa (PWA + Android)",
+  "description": "Expense tracker com sugest\u00f5es para a realidade portuguesa (PWA + Android)",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -12,19 +12,27 @@
     "android:add": "cap add android",
     "android:sync": "npm run build && cap sync android",
     "android:open": "cap open android",
-    "build:artifact": "tsc -b && vite build --mode artifact && node scripts/build-artifact.mjs"
+    "build:artifact": "tsc -b && vite build --mode artifact && node scripts/build-artifact.mjs",
+    "typecheck": "tsc -b && tsc -p tsconfig.server.json",
+    "dev:full": "vercel dev"
   },
   "dependencies": {
     "@capacitor/android": "^7.6.11",
     "@capacitor/app": "^7.1.2",
+    "@capacitor/browser": "^7.0.5",
     "@capacitor/core": "^7.6.11",
+    "jose": "^6.2.18",
+    "mongodb": "^6.22.0",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "unpdf": "^1.9.1"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.6.11",
+    "@types/node": "^22.20.7",
     "@types/react": "^19.3.3",
     "@types/react-dom": "^19.3.0",
+    "@vercel/node": "^33.0.0",
     "@vitejs/plugin-react": "^5.2.0",
     "typescript": "~5.8",
     "vite": "^7.3.8",

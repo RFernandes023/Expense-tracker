@@ -15,7 +15,7 @@ export function Transactions({ txs, month, onEdit }: { txs: Transaction[]; month
     return inMonth(txs, month)
       .filter((t) => (type === 'all' ? true : type === 'nonif' ? t.withNif === false && getCategory(t.category).deduction : t.type === type))
       .filter((t) => !cat || t.category === cat)
-      .filter((t) => !s || t.description.toLowerCase().includes(s) || getCategory(t.category).label.toLowerCase().includes(s))
+      .filter((t) => !s || [t.description, getCategory(t.category).label, t.merchant, t.merchantNif, t.atcud, t.ocrText].some((v) => v?.toLowerCase().includes(s)))
       .sort((a, b) => b.date.localeCompare(a.date));
   }, [txs, month, q, type, cat]);
 
@@ -29,7 +29,7 @@ export function Transactions({ txs, month, onEdit }: { txs: Transaction[]; month
 
   return (
     <div className="card">
-      <div className="search"><input className="input" placeholder="Procurar movimentos…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+      <div className="search"><input className="input" placeholder="Procurar (inclui o texto das faturas)…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       <div className="chips">
         {([['all', 'Todos'], ['expense', 'Despesas'], ['income', 'Receitas'], ['nonif', 'Sem NIF']] as const).map(([k, l]) => (
           <button key={k} className={`chip ${type === k ? 'active' : ''}`} onClick={() => setType(k)}>{l}</button>
@@ -45,9 +45,17 @@ export function Transactions({ txs, month, onEdit }: { txs: Transaction[]; month
       {groups.length === 0 ? <Empty icon="🔎" text="Nenhum movimento encontrado." /> : groups.map(([d, items]) => (
         <div key={d}>
           <div className="day-head"><span>{formatDate(d)}</span><span className="num">{fmt(totals(items).balance)}</span></div>
-          {items.map((t) => <TxRow key={t.id} t={t} onClick={() => onEdit(t)} />)}
+          {items.map((t) => <TxRow key={t.id} t={t} onClick={() => onEdit(t)} match={q.trim().length > 1 ? ocrSnippet(t.ocrText, q.trim()) : undefined} />)}
         </div>
       ))}
     </div>
   );
+}
+
+/** Excerto do texto da fatura à volta do termo pesquisado. */
+function ocrSnippet(text: string | undefined, q: string): string | undefined {
+  if (!text) return undefined;
+  const i = text.toLowerCase().indexOf(q.toLowerCase());
+  if (i < 0) return undefined;
+  return '…' + text.slice(Math.max(0, i - 25), i + q.length + 35).replace(/\s+/g, ' ') + '…';
 }
