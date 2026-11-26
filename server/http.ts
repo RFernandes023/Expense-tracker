@@ -28,9 +28,18 @@ export async function requireUser(req: VercelRequest, res: VercelResponse) {
   return s;
 }
 
+/** Traduz erros de configuração comuns para mensagens que indicam o que corrigir. */
+export function friendlyError(e: unknown): string {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (/bad auth|authentication failed/i.test(msg)) return 'Base de dados: utilizador ou password errados no MONGODB_URI.';
+  if (/querySrv|ENOTFOUND|ECONNREFUSED|Server selection timed out|timed out/i.test(msg)) return 'Base de dados inacessível: confirma o MONGODB_URI e o acesso 0.0.0.0/0 em Network Access no Atlas.';
+  if (/Invalid scheme|Invalid connection string|URI must include/i.test(msg)) return 'MONGODB_URI inválido: deve começar por mongodb+srv://';
+  return msg || 'Erro interno';
+}
+
 export function fail(res: VercelResponse, e: unknown) {
   console.error(e);
-  res.status(500).json({ error: e instanceof Error ? e.message : 'Erro interno' });
+  res.status(500).json({ error: friendlyError(e) });
 }
 
 /** Wrapper: CORS + tratamento de erros. */

@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { ANDROID_SCHEME, decodeIdToken, randomCode, verifyState, type Platform } from '../../server/auth.js';
 import { cols } from '../../server/db.js';
 import { appUrl, env, isEmailAllowed } from '../../server/env.js';
+import { friendlyError } from '../../server/http.js';
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
@@ -58,6 +59,6 @@ export default async function callback(req: VercelRequest, res: VercelResponse) 
     finish(res, platform, { auth_code: code });
   } catch (e) {
     console.error(e);
-    finish(res, platform, { auth_error: e instanceof Error ? e.message : 'Erro no login' });
+    finish(res, platform, { auth_error: friendlyError(e) });
   }
 }
