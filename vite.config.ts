@@ -2,8 +2,9 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   base: './',
+  build: mode === 'artifact' ? { outDir: 'dist-artifact', rollupOptions: { output: { inlineDynamicImports: true } } } : undefined,
   plugins: [
     react(),
     VitePWA({
@@ -27,4 +28,4 @@ export default defineConfig({
     })
   ],
   test: { environment: 'node' }
-} as any);
+}) as any);

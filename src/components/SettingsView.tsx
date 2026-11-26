@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { expenseCategories } from '../lib/categories';
 import { parseBackup, toCSV } from '../lib/storage';
 import type { AppData, Settings } from '../lib/types';
@@ -21,6 +21,7 @@ function download(name: string, content: string, mime: string) {
 export function SettingsView({ data, setSettings, replaceData, onDemo, notify }: Props) {
   const s = data.settings;
   const file = useRef<HTMLInputElement>(null);
+  const [confirmWipe, setConfirmWipe] = useState(false);
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) => setSettings({ ...s, [k]: v });
   const num = (v: string) => Math.max(0, Number(v.replace(',', '.')) || 0);
 
@@ -55,7 +56,12 @@ export function SettingsView({ data, setSettings, replaceData, onDemo, notify }:
             <button className="btn" onClick={() => file.current?.click()}>⬆️ Importar cópia</button>
             <button className="btn" onClick={() => download('movimentos.csv', '﻿' + toCSV(data.transactions), 'text/csv;charset=utf-8')}>📄 Exportar CSV</button>
             <button className="btn" onClick={onDemo}>🧪 Dados de exemplo</button>
-            <button className="btn danger" onClick={() => { if (confirm('Apagar todos os movimentos? Esta ação não pode ser desfeita.')) { replaceData({ ...data, transactions: [] }); notify('Dados apagados'); } }}>🗑️ Apagar tudo</button>
+            {confirmWipe ? (
+              <>
+                <button className="btn danger" onClick={() => { replaceData({ ...data, transactions: [] }); setConfirmWipe(false); notify('Dados apagados'); }}>Confirmar: apagar tudo</button>
+                <button className="btn" onClick={() => setConfirmWipe(false)}>Cancelar</button>
+              </>
+            ) : <button className="btn danger" onClick={() => setConfirmWipe(true)}>🗑️ Apagar tudo</button>}
           </div>
           <input ref={file} type="file" accept="application/json,.json" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) importFile(f); e.target.value = ''; }} />
         </div>

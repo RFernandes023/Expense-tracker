@@ -11,7 +11,8 @@
     "test": "vitest run",
     "android:add": "cap add android",
     "android:sync": "npm run build && cap sync android",
-    "android:open": "cap open android"
+    "android:open": "cap open android",
+    "build:artifact": "tsc -b && vite build --mode artifact && node scripts/build-artifact.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.6.11",

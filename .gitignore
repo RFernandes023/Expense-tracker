@@ -5,3 +5,4 @@ android/app/build
 android/.gradle
 android/build
 .DS_Store
+dist-artifact
